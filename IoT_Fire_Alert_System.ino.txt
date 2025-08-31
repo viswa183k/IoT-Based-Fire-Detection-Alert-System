@@ -1,0 +1,44 @@
+#define BLYNK_TEMPLATE_ID "Your_Template_ID"
+#define BLYNK_DEVICE_NAME "IoT Fire Alert"
+#define BLYNK_AUTH_TOKEN "Your_Auth_Token"
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
+// Pin definitions
+#define FLAME_SENSOR D5
+#define BUZZER D6
+#define LED D7
+
+// WiFi credentials
+char ssid[] = "Your_WiFi_SSID";
+char pass[] = "Your_WiFi_Password";
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(FLAME_SENSOR, INPUT);
+  pinMode(BUZZER, OUTPUT);
+  pinMode(LED, OUTPUT);
+
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+  Serial.println("Connecting to WiFi...");
+}
+
+void loop() {
+  Blynk.run();
+
+  int flameDetected = digitalRead(FLAME_SENSOR);
+
+  if (flameDetected == LOW) {  // Flame detected (sensor gives LOW)
+    Serial.println("🔥 Fire Detected!");
+    digitalWrite(BUZZER, HIGH);
+    digitalWrite(LED, HIGH);
+    Blynk.logEvent("fire_alert", "🔥 Fire Detected! Take Action Immediately!");
+  } else {
+    digitalWrite(BUZZER, LOW);
+    digitalWrite(LED, LOW);
+    Serial.println("No Fire");
+  }
+
+  delay(1000);
+}
